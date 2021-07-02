@@ -78,8 +78,8 @@
     ],
     "keybindings": [
       {
-        "key": "ctrl+shift+t",
-        "mac": "cmd+ctrl+p",
+        "key": "ctrl+alt+f",
+        "mac": "cmd+ctrl+f",
         "when": "editorTextFocus && !editorReadonly && editorLangId == vue",
         "command": "extension.vueFormat"
       }
