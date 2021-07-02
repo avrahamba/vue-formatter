@@ -3,6 +3,7 @@
   "displayName": "Vue-formater",
   "description": "",
   "version": "0.0.1",
+  "publisher": "avrahamba",
   "engines": {
     "vscode": "^1.57.0"
   },
