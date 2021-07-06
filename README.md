@@ -2,14 +2,14 @@
 
 Format single file with '.vue' used in 'vscode' editor.
 https://marketplace.visualstudio.com/items?itemName=febean.vue-format
-> If you have some issue, just let me know https://github.com/win7killer/vue-format
+> If you have some issue, just let me know https://github.com/avrahamba/vue-formatter
 
 > Your issue is my force for this project.  `Welcome to STAR && FORK`
 
 > Js-beautify is heavily dependent, so most of them are limited by js-beautify. In theory, the configuration of js-beautify can be applied.
 
 <!-- ## Features
-<img src="https://raw.githubusercontent.com/win7killer/vue-format/master/images/command.gif" alt="command" width=600/> -->
+<img src="https://raw.githubusercontent.com/avrahamba/vue-formatter/master/images/command.gif" alt="command" width=600/> -->
 
 ## Requirements
 - js-beautify: [https://github.com/beautify-web/js-beautify](https://github.com/beautify-web/js-beautify)

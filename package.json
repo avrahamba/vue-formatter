@@ -1,9 +1,9 @@
 {
-  "name": "vue-formater",
-  "displayName": "Vue-formater",
+  "name": "vue-formatter",
+  "displayName": "Vue-formatter",
   "description": "",
   "version": "0.0.1",
-  "publisher": "avrahamba",
+  "publisher": "AvrahamBenArosh",
   "engines": {
     "vscode": "^1.57.0"
   },
@@ -17,14 +17,14 @@
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": "vue-formater",
+      "title": "vue-formatter",
       "properties": {
-        "vue-formater.html_indent_root": {
+        "vue-formatter.html_indent_root": {
           "type": "boolean",
           "default": false,
           "description": "If indent the root-tag in .vue's template"
         },
-        "vue-formater.format_need": {
+        "vue-formatter.format_need": {
           "type": "array",
           "default": [
             "html",
@@ -33,17 +33,17 @@
           ],
           "description": "List of format, default [\"html\", \"js\", \"css\"]."
         },
-        "vue-formater.break_attr_limit": {
+        "vue-formatter.break_attr_limit": {
           "type": "number",
           "default": -1,
           "description": "Break attributes when tag's attributes.length > this number, no break when -1. "
         },
-        "vue-formater.attr_end_with_gt": {
+        "vue-formatter.attr_end_with_gt": {
           "type": "boolean",
           "default": true,
           "description": "If end attrs width '>' when break_attr_limit."
         },
-        "vue-formater.js-beautify": {
+        "vue-formatter.js-beautify": {
           "type": "object",
           "default": {
             "indent_size": "editor.tabSize",
@@ -61,7 +61,7 @@
           },
           "description": "The config use some js-beautify options, see js-beautify."
         },
-        "vue-formater.pug-beautify": {
+        "vue-formatter.pug-beautify": {
           "type": "object",
           "default": {
             "fill_tab": false
@@ -74,7 +74,7 @@
       {
         "when": "editorLangId == vue",
         "command": "extension.vueFormat",
-        "title": "vue-formater"
+        "title": "vue-formatter"
       }
     ],
     "keybindings": [
@@ -95,7 +95,11 @@
       ]
     }
   },
-  "scripts": {
+  "repository": {
+	"type": "git",
+	"url": "https://github.com/avrahamba/vue-formatter"
+},
+"scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
