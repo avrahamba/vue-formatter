@@ -28,35 +28,57 @@
 
 'use strict';
 
-function Directives(start_block_pattern, end_block_pattern) {
-  start_block_pattern = typeof start_block_pattern === 'string' ? start_block_pattern : start_block_pattern.source;
-  end_block_pattern = typeof end_block_pattern === 'string' ? end_block_pattern : end_block_pattern.source;
-  this.__directives_block_pattern = new RegExp(start_block_pattern + / beautify( \w+[:]\w+)+ /.source + end_block_pattern, 'g');
-  this.__directive_pattern = / (\w+)[:](\w+)/g;
+class TokenStream {
+  __tokens: any
+  __tokens_length: any
+  __position: any
+  __parent_token: any
+  constructor(parent_token?: any) {
+    // private
+    this.__tokens = [];
+    this.__tokens_length = this.__tokens.length;
+    this.__position = 0;
+    this.__parent_token = parent_token;
+  }
 
-  this.__directives_end_ignore_pattern = new RegExp(start_block_pattern + /\sbeautify\signore:end\s/.source + end_block_pattern, 'g');
+  restart() {
+    this.__position = 0;
+  };
+
+  isEmpty() {
+    return this.__tokens_length === 0;
+  };
+
+  hasNext() {
+    return this.__position < this.__tokens_length;
+  };
+
+  next() {
+    var val = null;
+    if (this.hasNext()) {
+      val = this.__tokens[this.__position];
+      this.__position += 1;
+    }
+    return val;
+  };
+
+  peek(index: any) {
+    var val = null;
+    index = index || 0;
+    index += this.__position;
+    if (index >= 0 && index < this.__tokens_length) {
+      val = this.__tokens[index];
+    }
+    return val;
+  };
+
+  add(token: any) {
+    if (this.__parent_token) {
+      token.parent = this.__parent_token;
+    }
+    this.__tokens.push(token);
+    this.__tokens_length += 1;
+  };
 }
 
-Directives.prototype.get_directives = function(text) {
-  if (!text.match(this.__directives_block_pattern)) {
-    return null;
-  }
-
-  var directives = {};
-  this.__directive_pattern.lastIndex = 0;
-  var directive_match = this.__directive_pattern.exec(text);
-
-  while (directive_match) {
-    directives[directive_match[1]] = directive_match[2];
-    directive_match = this.__directive_pattern.exec(text);
-  }
-
-  return directives;
-};
-
-Directives.prototype.readIgnored = function(input) {
-  return input.readUntilAfter(this.__directives_end_ignore_pattern);
-};
-
-
-module.exports.Directives = Directives;
+export default TokenStream

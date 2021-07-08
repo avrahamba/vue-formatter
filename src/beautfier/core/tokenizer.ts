@@ -28,10 +28,10 @@
 
 'use strict';
 
-var InputScanner = require('../core/inputscanner').InputScanner;
-var Token = require('../core/token').Token;
-var TokenStream = require('../core/tokenstream').TokenStream;
-var WhitespacePattern = require('./whitespacepattern').WhitespacePattern;
+import InputScanner from './inputscanner';
+import Token from './token';
+import TokenStream from './tokenstream';
+import WhitespacePattern from './whitespacepattern';
 
 var TOKEN = {
   START: 'TK_START',
@@ -39,7 +39,12 @@ var TOKEN = {
   EOF: 'TK_EOF'
 };
 
-var Tokenizer = function(input_string, options) {
+class Tokenizer{
+  _input:any
+_options:any
+__tokens:any
+_patterns:any
+  constructor(input_string:any, options:any) {
   this._input = new InputScanner(input_string);
   this._options = options || {};
   this.__tokens = null;
@@ -48,7 +53,7 @@ var Tokenizer = function(input_string, options) {
   this._patterns.whitespace = new WhitespacePattern(this._input);
 };
 
-Tokenizer.prototype.tokenize = function() {
+tokenize() {
   this._input.restart();
   this.__tokens = new TokenStream();
 
@@ -95,13 +100,13 @@ Tokenizer.prototype.tokenize = function() {
 };
 
 
-Tokenizer.prototype._is_first_token = function() {
+_is_first_token() {
   return this.__tokens.isEmpty();
 };
 
-Tokenizer.prototype._reset = function() {};
+_reset() {};
 
-Tokenizer.prototype._get_next_token = function(previous_token, open_token) { // jshint unused:false
+_get_next_token(previous_token:any, open_token:any) { // jshint unused:false
   this._readWhitespace();
   var resulting_string = this._input.read(/.+/g);
   if (resulting_string) {
@@ -111,30 +116,32 @@ Tokenizer.prototype._get_next_token = function(previous_token, open_token) { // 
   }
 };
 
-Tokenizer.prototype._is_comment = function(current_token) { // jshint unused:false
+_is_comment(current_token:any) { // jshint unused:false
   return false;
 };
 
-Tokenizer.prototype._is_opening = function(current_token) { // jshint unused:false
+_is_opening(current_token:any) { // jshint unused:false
   return false;
 };
 
-Tokenizer.prototype._is_closing = function(current_token, open_token) { // jshint unused:false
+_is_closing(current_token:any, open_token:any) { // jshint unused:false
   return false;
 };
 
-Tokenizer.prototype._create_token = function(type, text) {
+_create_token(type:any, text:any) {
   var token = new Token(type, text,
     this._patterns.whitespace.newline_count,
     this._patterns.whitespace.whitespace_before_token);
   return token;
 };
 
-Tokenizer.prototype._readWhitespace = function() {
+_readWhitespace() {
   return this._patterns.whitespace.read();
 };
 
+}
 
-
-module.exports.Tokenizer = Tokenizer;
-module.exports.TOKEN = TOKEN;
+export {
+  Tokenizer,
+  TOKEN
+}

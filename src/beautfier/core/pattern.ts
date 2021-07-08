@@ -28,7 +28,14 @@
 
 'use strict';
 
-function Pattern(input_scanner, parent) {
+class Pattern{
+  _input:any
+  _starting_pattern:any
+  _match_pattern:any
+  _until_pattern:any
+  _until_after:any
+
+  constructor(input_scanner:any, parent?:any) {
   this._input = input_scanner;
   this._starting_pattern = null;
   this._match_pattern = null;
@@ -43,7 +50,7 @@ function Pattern(input_scanner, parent) {
   }
 }
 
-Pattern.prototype.read = function() {
+read() {
   var result = this._input.read(this._starting_pattern);
   if (!this._starting_pattern || result) {
     result += this._input.read(this._match_pattern, this._until_pattern, this._until_after);
@@ -51,11 +58,11 @@ Pattern.prototype.read = function() {
   return result;
 };
 
-Pattern.prototype.read_match = function() {
+read_match() {
   return this._input.match(this._match_pattern);
 };
 
-Pattern.prototype.until_after = function(pattern) {
+until_after(pattern:any) {
   var result = this._create();
   result._until_after = true;
   result._until_pattern = this._input.get_regexp(pattern);
@@ -63,7 +70,7 @@ Pattern.prototype.until_after = function(pattern) {
   return result;
 };
 
-Pattern.prototype.until = function(pattern) {
+until(pattern:any) {
   var result = this._create();
   result._until_after = false;
   result._until_pattern = this._input.get_regexp(pattern);
@@ -71,24 +78,25 @@ Pattern.prototype.until = function(pattern) {
   return result;
 };
 
-Pattern.prototype.starting_with = function(pattern) {
+starting_with(pattern:any) {
   var result = this._create();
   result._starting_pattern = this._input.get_regexp(pattern, true);
   result._update();
   return result;
 };
 
-Pattern.prototype.matching = function(pattern) {
+matching(pattern:any) {
   var result = this._create();
   result._match_pattern = this._input.get_regexp(pattern, true);
   result._update();
   return result;
 };
 
-Pattern.prototype._create = function() {
+_create() {
   return new Pattern(this._input, this);
 };
 
-Pattern.prototype._update = function() {};
+_update() {};
+}
 
-module.exports.Pattern = Pattern;
+export default Pattern

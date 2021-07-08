@@ -29,9 +29,8 @@
 'use strict';
 
 import Options from './options';
-import { Output } from '../core/output';
-import { Tokenizer } from './tokenizer';
-import { TOKEN } from './tokenizer';
+import Output  from '../core/output';
+import { Tokenizer,TOKEN } from './tokenizer';
 
 var lineBreak = /\r\n|[\r\n]/;
 var allLineBreaks = /\r\n|[\r\n]/g;

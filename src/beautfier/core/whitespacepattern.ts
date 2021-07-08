@@ -28,22 +28,27 @@
 
 'use strict';
 
-var Pattern = require('../core/pattern').Pattern;
+import Pattern from './pattern';
 
-function WhitespacePattern(input_scanner, parent) {
-  Pattern.call(this, input_scanner, parent);
-  if (parent) {
-    this._line_regexp = this._input.get_regexp(parent._line_regexp);
-  } else {
-    this.__set_whitespace_patterns('', '');
+class WhitespacePattern extends Pattern{
+  _line_regexp:any
+  newline_count:any
+  whitespace_before_token:any
+  _match_pattern:any
+  _newline_regexp:any
+  _input:any
+  constructor(input_scanner:any, parent?:any) {
+    super(input_scanner, parent);
+    if (parent) {
+      this._line_regexp = this._input.get_regexp(parent._line_regexp);
+    } else {
+      this.__set_whitespace_patterns('', '');
+    }
+  
+    this.newline_count = 0;
+    this.whitespace_before_token = '';
   }
-
-  this.newline_count = 0;
-  this.whitespace_before_token = '';
-}
-WhitespacePattern.prototype = new Pattern();
-
-WhitespacePattern.prototype.__set_whitespace_patterns = function(whitespace_chars, newline_chars) {
+__set_whitespace_patterns(whitespace_chars:any, newline_chars:any) {
   whitespace_chars += '\\t ';
   newline_chars += '\\n\\r';
 
@@ -53,7 +58,7 @@ WhitespacePattern.prototype.__set_whitespace_patterns = function(whitespace_char
     '\\r\\n|[' + newline_chars + ']');
 };
 
-WhitespacePattern.prototype.read = function() {
+read() {
   this.newline_count = 0;
   this.whitespace_before_token = '';
 
@@ -69,18 +74,18 @@ WhitespacePattern.prototype.read = function() {
   return resulting_string;
 };
 
-WhitespacePattern.prototype.matching = function(whitespace_chars, newline_chars) {
+matching(whitespace_chars:any, newline_chars?:any) {
   var result = this._create();
   result.__set_whitespace_patterns(whitespace_chars, newline_chars);
   result._update();
   return result;
 };
 
-WhitespacePattern.prototype._create = function() {
+_create() {
   return new WhitespacePattern(this._input, this);
 };
 
-WhitespacePattern.prototype.__split = function(regexp, input_string) {
+__split(regexp:any, input_string:any) {
   regexp.lastIndex = 0;
   var start_index = 0;
   var result = [];
@@ -99,7 +104,6 @@ WhitespacePattern.prototype.__split = function(regexp, input_string) {
 
   return result;
 };
+}
 
-
-
-module.exports.WhitespacePattern = WhitespacePattern;
+export default WhitespacePattern
