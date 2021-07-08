@@ -104,7 +104,6 @@ let methods = {
 		} else {
 			let tempConf = Object.assign(this.jsBeautifyConf, defaultConf.html);
 			str = beautifyHtml(text,tempConf);
-			// str = beautify.html(text, tempConf);
 			if (tempConf.wrap_attributes === 'auto' && +this.vueFormatConf.breakAttrLimit > -1) {
 				str = breakTagAttr(str, +this.vueFormatConf.breakAttrLimit, {
 					indentSize: +defaultConf.indentSize,

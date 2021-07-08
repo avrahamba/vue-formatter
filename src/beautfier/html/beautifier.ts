@@ -29,19 +29,25 @@
 'use strict';
 
 import Options from './options';
-import Output  from '../core/output';
-import { Tokenizer,TOKEN } from './tokenizer';
+import Output from '../core/output';
+import { Tokenizer, TOKEN } from './tokenizer';
+import * as beautify from 'js-beautify';
+import defaultConf from '../../modules/js-beautify.conf';
+
+const isVueJsAttribute = (text: string): boolean => {
+  return (text.startsWith(':') || text.startsWith('v-') || text.startsWith('@'))
+}
 
 var lineBreak = /\r\n|[\r\n]/;
 var allLineBreaks = /\r\n|[\r\n]/g;
 
 class Printer {
 
-  indent_level:any
-  alignment_size:any
-  max_preserve_newlines:any
-  preserve_newlines:any
-  _output:any
+  indent_level: any
+  alignment_size: any
+  max_preserve_newlines: any
+  preserve_newlines: any
+  _output: any
   constructor(options: any, base_indent_string: any) { //handles input/output and some other printing functions
 
     this.indent_level = 0;
@@ -56,7 +62,7 @@ class Printer {
     return this._output.current_line.has_match(pattern);
   };
 
-  set_space_before_token(value: any, non_breaking: any) {
+  set_space_before_token(value: any, non_breaking?: any) {
     this._output.space_before_token = value;
     this._output.non_breaking_space = non_breaking;
   };
@@ -253,26 +259,26 @@ class TagStack {
 }
 class TagOpenParserToken {
 
-  parent:any
-  text:any
-  type:any
-  tag_name:any
-  is_inline_element:any
-  is_unformatted:any
-  is_content_unformatted:any
-  is_empty_element:any
-  is_start_tag:any
-  is_end_tag:any
-  indent_content:any
-  multiline_content:any
-  custom_beautifier_name:any
-  start_tag_token:any
-  attr_count:any
-  has_wrapped_attrs:any
-  alignment_size:any
-  tag_complete:any
-  tag_start_char:any
-  tag_check:any
+  parent: any
+  text: any
+  type: any
+  tag_name: any
+  is_inline_element: any
+  is_unformatted: any
+  is_content_unformatted: any
+  is_empty_element: any
+  is_start_tag: any
+  is_end_tag: any
+  indent_content: any
+  multiline_content: any
+  custom_beautifier_name: any
+  start_tag_token: any
+  attr_count: any
+  has_wrapped_attrs: any
+  alignment_size: any
+  tag_complete: any
+  tag_start_char: any
+  tag_check: any
   constructor(parent?: any, raw_token?: any) {
     this.parent = parent || null;
     this.text = '';
@@ -338,17 +344,17 @@ var p_parent_excludes = ['a', 'audio', 'del', 'ins', 'map', 'noscript', 'video']
 
 
 class Beautifier {
-  _source_text:any
-  _js_beautify:any
-  _css_beautify:any
-  _tag_stack:any
-  _options:any
-  _is_wrap_attributes_force:any
-  _is_wrap_attributes_force_expand_multiline:any
-  _is_wrap_attributes_force_aligned:any
-  _is_wrap_attributes_aligned_multiple:any
-  _is_wrap_attributes_preserve:any
-  _is_wrap_attributes_preserve_aligned:any
+  _source_text: any
+  _js_beautify: any
+  _css_beautify: any
+  _tag_stack: any
+  _options: any
+  _is_wrap_attributes_force: any
+  _is_wrap_attributes_force_expand_multiline: any
+  _is_wrap_attributes_force_aligned: any
+  _is_wrap_attributes_aligned_multiple: any
+  _is_wrap_attributes_preserve: any
+  _is_wrap_attributes_preserve_aligned: any
   constructor(source_text: any, options: any, js_beautify: any, css_beautify: any) {
     //Wrapper function to invoke all the necessary constructors and deal with the output.
     this._source_text = source_text || '';
@@ -392,7 +398,7 @@ class Beautifier {
 
     var baseIndentString = source_text.match(/^[\t ]*/)[0];
 
-    var last_token:any = {
+    var last_token: any = {
       text: '',
       type: ''
     };
@@ -470,7 +476,7 @@ class Beautifier {
     return parser_token;
   };
 
-  _handle_inside_tag(printer: any, raw_token: any, last_tag_token: any, tokens: any) {
+  _handle_inside_tag(printer: Printer, raw_token: any, last_tag_token: any, tokens: any) {
     var wrapped = last_tag_token.has_wrapped_attrs;
     var parser_token = {
       text: raw_token.text,
@@ -529,6 +535,21 @@ class Beautifier {
           }
         }
       }
+
+      if (raw_token.type === TOKEN.VALUE && raw_token.previous.type === TOKEN.EQUALS && raw_token.previous.previous.type === TOKEN.ATTRIBUTE) {
+        if (isVueJsAttribute(raw_token.previous.previous.text) && raw_token.text.startsWith('"') && raw_token.text.endsWith('"')) {
+          let text = raw_token.text.split('"').filter((t:string)=>t).join('')
+
+
+          const tempConf: beautify.JSBeautifyOptions = Object.assign({}, defaultConf.jsBeautify, defaultConf.js);
+          text = beautify.js(text, tempConf);
+
+      
+          // console.log('text :>> ', text);
+          raw_token.text = '"' + text + '"'
+        }
+      }
+
       printer.print_token(raw_token);
       wrapped = wrapped || printer.previous_token_wrapped();
       last_tag_token.has_wrapped_attrs = wrapped;
@@ -566,7 +587,7 @@ class Beautifier {
       } else if (last_tag_token.custom_beautifier_name === 'css' && typeof this._css_beautify === 'function') {
         _beautifier = this._css_beautify;
       } else if (last_tag_token.custom_beautifier_name === 'html') {
-        _beautifier = function (html_source:any, options:any) {
+        _beautifier = function (html_source: any, options: any) {
           var beautifier = new Beautifier(html_source, options, local._js_beautify, local._css_beautify);
           return beautifier.beautify();
         };
@@ -587,7 +608,7 @@ class Beautifier {
       // Handle the case where content is wrapped in a comment or cdata.
       if (last_tag_token.custom_beautifier_name !== 'html' &&
         text[0] === '<' && text.match(/^(<!--|<!\[CDATA\[)/)) {
-        var matched:any = /^(<!--[^\n]*|<!\[CDATA\[)(\n?)([ \t\n]*)([\s\S]*)(-->|]]>)$/.exec(text);
+        var matched: any = /^(<!--[^\n]*|<!\[CDATA\[)(\n?)([ \t\n]*)([\s\S]*)(-->|]]>)$/.exec(text);
 
         // if we start to wrap but don't finish, print raw
         if (!matched) {
@@ -618,8 +639,8 @@ class Beautifier {
       if (text) {
         if (_beautifier) {
           // call the Beautifier if avaliable
-          class Child_options{
-            eol:any
+          class Child_options {
+            eol: any
             constructor() {
               this.eol = '\n';
             };

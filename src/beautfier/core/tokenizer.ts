@@ -39,105 +39,105 @@ var TOKEN = {
   EOF: 'TK_EOF'
 };
 
-class Tokenizer{
-  _input:any
-_options:any
-__tokens:any
-_patterns:any
-  constructor(input_string:any, options:any) {
-  this._input = new InputScanner(input_string);
-  this._options = options || {};
-  this.__tokens = null;
+class Tokenizer {
+  _input: any
+  _options: any
+  __tokens: any
+  _patterns: any
+  constructor(input_string: any, options: any) {
+    this._input = new InputScanner(input_string);
+    this._options = options || {};
+    this.__tokens = null;
 
-  this._patterns = {};
-  this._patterns.whitespace = new WhitespacePattern(this._input);
-};
+    this._patterns = {};
+    this._patterns.whitespace = new WhitespacePattern(this._input);
+  };
 
-tokenize() {
-  this._input.restart();
-  this.__tokens = new TokenStream();
+  tokenize() {
+    this._input.restart();
+    this.__tokens = new TokenStream();
 
-  this._reset();
+    this._reset();
 
-  var current;
-  var previous = new Token(TOKEN.START, '');
-  var open_token = null;
-  var open_stack = [];
-  var comments = new TokenStream();
+    var current;
+    var previous = new Token(TOKEN.START, '');
+    var open_token = null;
+    var open_stack = [];
+    var comments = new TokenStream();
 
-  while (previous.type !== TOKEN.EOF) {
-    current = this._get_next_token(previous, open_token);
-    while (this._is_comment(current)) {
-      comments.add(current);
+    while (previous.type !== TOKEN.EOF) {
       current = this._get_next_token(previous, open_token);
-    }
+      while (this._is_comment(current)) {
+        comments.add(current);
+        current = this._get_next_token(previous, open_token);
+      }
 
-    if (!comments.isEmpty()) {
-      current.comments_before = comments;
-      comments = new TokenStream();
-    }
+      if (!comments.isEmpty()) {
+        current.comments_before = comments;
+        comments = new TokenStream();
+      }
 
-    current.parent = open_token;
-
-    if (this._is_opening(current)) {
-      open_stack.push(open_token);
-      open_token = current;
-    } else if (open_token && this._is_closing(current, open_token)) {
-      current.opened = open_token;
-      open_token.closed = current;
-      open_token = open_stack.pop();
       current.parent = open_token;
+
+      if (this._is_opening(current)) {
+        open_stack.push(open_token);
+        open_token = current;
+      } else if (open_token && this._is_closing(current, open_token)) {
+        current.opened = open_token;
+        open_token.closed = current;
+        open_token = open_stack.pop();
+        current.parent = open_token;
+      }
+
+      current.previous = previous;
+      previous.next = current;
+
+      this.__tokens.add(current);
+      previous = current;
     }
 
-    current.previous = previous;
-    previous.next = current;
-
-    this.__tokens.add(current);
-    previous = current;
-  }
-
-  return this.__tokens;
-};
+    return this.__tokens;
+  };
 
 
-_is_first_token() {
-  return this.__tokens.isEmpty();
-};
+  _is_first_token() {
+    return this.__tokens.isEmpty();
+  };
 
-_reset() {};
+  _reset() { };
 
-_get_next_token(previous_token:any, open_token:any) { // jshint unused:false
-  this._readWhitespace();
-  var resulting_string = this._input.read(/.+/g);
-  if (resulting_string) {
-    return this._create_token(TOKEN.RAW, resulting_string);
-  } else {
-    return this._create_token(TOKEN.EOF, '');
-  }
-};
+  _get_next_token(previous_token: any, open_token: any) { // jshint unused:false
+    this._readWhitespace();
+    var resulting_string = this._input.read(/.+/g);
+    if (resulting_string) {
+      return this._create_token(TOKEN.RAW, resulting_string);
+    } else {
+      return this._create_token(TOKEN.EOF, '');
+    }
+  };
 
-_is_comment(current_token:any) { // jshint unused:false
-  return false;
-};
+  _is_comment(current_token: any) { // jshint unused:false
+    return false;
+  };
 
-_is_opening(current_token:any) { // jshint unused:false
-  return false;
-};
+  _is_opening(current_token: any) { // jshint unused:false
+    return false;
+  };
 
-_is_closing(current_token:any, open_token:any) { // jshint unused:false
-  return false;
-};
+  _is_closing(current_token: any, open_token: any) { // jshint unused:false
+    return false;
+  };
 
-_create_token(type:any, text:any) {
-  var token = new Token(type, text,
-    this._patterns.whitespace.newline_count,
-    this._patterns.whitespace.whitespace_before_token);
-  return token;
-};
+  _create_token(type: any, text: any) {
+    var token = new Token(type, text,
+      this._patterns.whitespace.newline_count,
+      this._patterns.whitespace.whitespace_before_token);
+    return token;
+  };
 
-_readWhitespace() {
-  return this._patterns.whitespace.read();
-};
+  _readWhitespace() {
+    return this._patterns.whitespace.read();
+  };
 
 }
 
