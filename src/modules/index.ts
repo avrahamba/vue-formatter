@@ -9,9 +9,11 @@ import {
 	workspace
 } from 'vscode';
 import * as beautify from 'js-beautify';
+import  beautifyHtml from '../beautfier/html/index';
+
+
 import * as pugBeautify from 'pug-beautify';
-
-
+// console.log('beautifyHtml :>> ', beautifyHtml);
 import breakTagAttr from './plugins';
 import defaultConf from './js-beautify.conf';
 let editor: any;
@@ -32,7 +34,7 @@ let methods = {
 		this.doc = editor.document;
 		// Get configuration
 		this.getConfig();
-		
+
 		// Number of lines
 		this.lineCount = this.doc.lineCount;
 		// content
@@ -95,12 +97,14 @@ let methods = {
 		let lang = this.getLang(text);
 
 		text = indentRoot ? text : text.replace(/<template[^>]*>([\w\W]+)<\/template>/, '$1');
+		
 		if (/pug/.test(lang)) {
 			str = pugBeautify(text, this.pugBeautifyConf)
-				.trim();
+			.trim();
 		} else {
 			let tempConf = Object.assign(this.jsBeautifyConf, defaultConf.html);
-			str = beautify.html(text, tempConf);
+			str = beautifyHtml(text,tempConf);
+			// str = beautify.html(text, tempConf);
 			if (tempConf.wrap_attributes === 'auto' && +this.vueFormatConf.breakAttrLimit > -1) {
 				str = breakTagAttr(str, +this.vueFormatConf.breakAttrLimit, {
 					indentSize: +defaultConf.indentSize,

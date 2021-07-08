@@ -10,11 +10,11 @@ interface Iex {
     pugBeautify: {
         fill_tab: boolean
     }
-    indentSize:string
-css:any
-js:any
-html:any
-    
+    indentSize: string
+    css: any
+    js: any
+    html: any
+
 }
 
 const ex: Iex = {
